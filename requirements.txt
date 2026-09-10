@@ -1,0 +1,5 @@
+livekit-agents[deepgram,openai,fishaudio,silero]~=1.0
+livekit-api
+python-dotenv
+fastembed
+numpy
