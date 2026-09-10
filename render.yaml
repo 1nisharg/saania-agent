@@ -1,0 +1,63 @@
+services:
+  - type: worker
+    name: sania-agent
+    runtime: python
+
+    buildCommand: pip install -r requirements.txt
+
+    startCommand: python livekit_agent_hosted.py start
+
+    envVars:
+      - key: LIVEKIT_URL
+        sync: false
+
+      - key: LIVEKIT_API_KEY
+        sync: false
+
+      - key: LIVEKIT_API_SECRET
+        sync: false
+
+      - key: DEEPGRAM_API_KEY
+        sync: false
+
+      - key: GROQ_API_KEY
+        sync: false
+
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-120b
+
+      - key: GROQ_REASONING_EFFORT
+        value: low
+
+      - key: FISH_AUDIO_API_KEY
+        sync: false
+
+      - key: FISH_AUDIO_MODEL
+        value: s2.1-pro-free
+
+      - key: FISH_AUDIO_VOICE_ID
+        sync: false
+
+      - key: FISH_AUDIO_SPEED
+        value: "1.15"
+
+      - key: LIVEKIT_LAPTOP_AGENT_NAME
+        value: aarna-sania-laptop-test
+
+      - key: MAX_SPOKEN_SENTENCES_PER_TURN
+        value: "2"
+
+      - key: KB_SIMILARITY_THRESHOLD
+        value: "0.55"
+
+      - key: KB_EMBEDDING_MODEL_NAME
+        value: BAAI/bge-small-en-v1.5
+
+      - key: HOLD_FIRST_CHECK_S
+        value: "5"
+
+      - key: HOLD_SECOND_CHECK_S
+        value: "10"
+
+      - key: HOLD_FINAL_WAIT_S
+        value: "10"
