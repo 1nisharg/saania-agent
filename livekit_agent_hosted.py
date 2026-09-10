@@ -191,25 +191,13 @@ _FAREWELL_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
-# FIX — per explicit request ("universal" credentials — anyone connects
-# anytime with no separate dispatch step): this worker no longer uses
-# explicit dispatch. AGENT_NAME (and the agent_name= kwarg on
-# WorkerOptions below) is intentionally gone — confirmed directly
-# against LiveKit's own docs: "By default, an agent is automatically
-# dispatched to each new room... Automatic dispatch is the best option
-# if you want to assign the same agent to all new participants" — that
-# is exactly this use case. As long as this worker process is running,
-# ANY room someone connects to (via livekit_laptop_client.html + the
-# token from livekit_laptop_test.py) gets Sania joining automatically —
-# no need to run a separate dispatch script per session anymore.
-#
-# Real trade-off, not hidden: livekit_laptop_test.py no longer creates a
-# job dispatch, so it can no longer attach per-call metadata
-# (partner_name, category, etc.) — there's nothing left to attach it to.
-# Sania now always uses the same generic pitch context on this file. If
-# you need a personalized per-partner test again, that requires
-# switching back to explicit dispatch, not something this file can do
-# both ways at once.
+# DEPLOYMENT — this hosted worker uses EXPLICIT agent dispatch.
+# The token backend creates one LiveKit room per lead and dispatches this
+# agent by name, attaching per-call metadata (partner_name, contact_name,
+# category, company_synopsis, digitisation). The entrypoint below reads
+# that metadata and builds the personalized Sania prompt for the call.
+# The dispatch name must match the LIVEKIT_AGENT_NAME value used by the
+# backend.
 
 _STATIC_KEYTERMS = [
     "Viator", "Aarna", "Sania", "Mondee", "GetYourGuide",
@@ -1350,7 +1338,15 @@ async def entrypoint(ctx: JobContext) -> None:
 
 
 if __name__ == "__main__":
-    # No agent_name here — see the comment near the top of this file for
-    # why: this is deliberate, confirmed-correct automatic dispatch, not
-    # an oversight.
-    cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint, agent_name=os.getenv("LIVEKIT_LAPTOP_AGENT_NAME", "aarna-sania-laptop-test")))
+    # Render Free deploys this process as a Web Service, so the LiveKit
+    # worker's built-in HTTP health server must listen on Render's PORT.
+    # LiveKit exposes / for health checks and /worker for worker details.
+    # This keeps the actual Sania worker and Render health endpoint in the
+    # same process; no second web server is required.
+    cli.run_app(
+        WorkerOptions(
+            entrypoint_fnc=entrypoint,
+            agent_name=os.getenv("LIVEKIT_AGENT_NAME", "aarna-sania-laptop-test"),
+            port=int(os.getenv("PORT", "10000")),
+        )
+    )
