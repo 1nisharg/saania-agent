@@ -1,13 +1,19 @@
 services:
-  - type: worker
-    name: sania-agent
+  - type: web
+    name: saania-agent
     runtime: python
+    plan: free
 
     buildCommand: pip install -r requirements.txt
 
     startCommand: python livekit_agent_hosted.py start
 
+    healthCheckPath: /
+
     envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.4"
+
       - key: LIVEKIT_URL
         sync: false
 
@@ -16,6 +22,9 @@ services:
 
       - key: LIVEKIT_API_SECRET
         sync: false
+
+      - key: LIVEKIT_AGENT_NAME
+        value: aarna-sania-laptop-test
 
       - key: DEEPGRAM_API_KEY
         sync: false
@@ -40,9 +49,6 @@ services:
 
       - key: FISH_AUDIO_SPEED
         value: "1.15"
-
-      - key: LIVEKIT_LAPTOP_AGENT_NAME
-        value: aarna-sania-laptop-test
 
       - key: MAX_SPOKEN_SENTENCES_PER_TURN
         value: "2"
