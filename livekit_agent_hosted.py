@@ -1346,9 +1346,18 @@ if __name__ == "__main__":
    cli.run_app(
     WorkerOptions(
         entrypoint_fnc=entrypoint,
-        agent_name=os.getenv("LIVEKIT_AGENT_NAME", "aarna-sania-laptop-test"),
+        agent_name=os.getenv(
+            "LIVEKIT_AGENT_NAME",
+            "aarna-sania-laptop-test",
+        ),
         port=int(os.getenv("PORT", "10000")),
-        num_idle_processes=0,
+
+        # Keep one Sania process warm so the first caller
+        # does not have to wait for a new process to start.
+        num_idle_processes=1,
+
+        # Sania loads the embedding model/plugins, so give the
+        # worker plenty of time to initialize the child process.
         initialize_process_timeout=120,
     )
 )
