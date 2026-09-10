@@ -1343,10 +1343,12 @@ if __name__ == "__main__":
     # LiveKit exposes / for health checks and /worker for worker details.
     # This keeps the actual Sania worker and Render health endpoint in the
     # same process; no second web server is required.
-    cli.run_app(
-        WorkerOptions(
-            entrypoint_fnc=entrypoint,
-            agent_name=os.getenv("LIVEKIT_AGENT_NAME", "aarna-sania-laptop-test"),
-            port=int(os.getenv("PORT", "10000")),
-        )
+   cli.run_app(
+    WorkerOptions(
+        entrypoint_fnc=entrypoint,
+        agent_name=os.getenv("LIVEKIT_AGENT_NAME", "aarna-sania-laptop-test"),
+        port=int(os.getenv("PORT", "10000")),
+        num_idle_processes=0,
+        initialize_process_timeout=120,
     )
+)
